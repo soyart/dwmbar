@@ -26,11 +26,11 @@ func (f temperature) String() string {
 			avg += float64(f.temps[i])
 		}
 		avg /= float64(len(f.temps))
-		return fmt.Sprintf("temperature(avg): %.2f°C", avg)
+		return fmt.Sprintf("temps(avg): %.2f°C", avg)
 	}
 
 	s := new(bytes.Buffer)
-	s.WriteString("temperatures:")
+	s.WriteString("temps:")
 	// Try to make it compact for multi-core machines
 	for i, temp := range f.temps {
 		fmt.Fprintf(s, " cpus[%d]:%d", i, temp)
