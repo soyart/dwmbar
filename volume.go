@@ -25,9 +25,9 @@ type argsVolume struct {
 
 func (v volume) String() string {
 	if v.muted {
-		return fmt.Sprintf("vol: %.2f [MUTED]", v.percent)
+		return fmt.Sprintf("vol: %.0f%% [MUTED]", v.percent)
 	}
-	return fmt.Sprintf("vol: %.2f", v.percent)
+	return fmt.Sprintf("vol: %.0f%%", v.percent)
 }
 
 func pollVolume(args argsVolume) poller[volume] {
@@ -118,7 +118,7 @@ func getVolumeWpctlV2() (volume, error) {
 		return volume{}, fmt.Errorf("failed to parse volumeStr '%s'", volumeStr)
 	}
 	return volume{
-		percent: percent,
+		percent: percent * 100,
 		muted:   muted,
 	}, nil
 }

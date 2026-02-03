@@ -16,7 +16,7 @@ type argsBrightness struct {
 }
 
 func (b brightness) String() string {
-	return fmt.Sprintf("bright: %.2f%%", float64(b.value)/float64(b.max)*100.0)
+	return fmt.Sprintf("bright: %.0f%%", float64(b.value)/float64(b.max)*100.0)
 }
 
 func pollBrightness(args argsBrightness) poller[brightness] {
