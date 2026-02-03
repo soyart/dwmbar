@@ -20,7 +20,7 @@ func (f fans) String() string {
 	if len(f.rpms) == 0 {
 		return "rpm: no data"
 	}
-	result := bytes.NewBufferString("rpm: ")
+	result := bytes.NewBufferString("rpm:")
 	for _, r := range f.rpms {
 		fmt.Fprintf(result, " %d", r)
 	}
