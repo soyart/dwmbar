@@ -55,12 +55,17 @@ func getVolumePulseDBusV2() (volume, error) {
 	}
 	defer conn.Close()
 
-	pulseaudio := conn.Object("org.PulseAudio1", "/org/pulseaudio/core1")
+	pulseaudio := conn.Object(
+		"org.PulseAudio1",
+		"/org/pulseaudio/core1",
+	)
 	var sinkPath dbus.ObjectPath
 	err = pulseaudio.Call(
-		"org.freedesktop.DBus.Properties.Get", 0,
-		"org.PulseAudio.Core1", "FallbackSink").
-		Store(&sinkPath)
+		"org.freedesktop.DBus.Properties.Get",
+		0,
+		"org.PulseAudio.Core1",
+		"FallbackSink",
+	).Store(&sinkPath)
 	if err != nil {
 		return volume{}, fmt.Errorf("get sink: %w", err)
 	}
@@ -68,15 +73,23 @@ func getVolumePulseDBusV2() (volume, error) {
 	sinkObj := conn.Object("org.PulseAudio1", sinkPath)
 
 	var volumes []uint32
-	err = sinkObj.Call("org.freedesktop.DBus.Properties.Get", 0,
-		"org.PulseAudio.Core1.Device", "Volume").Store(&volumes)
+	err = sinkObj.Call(
+		"org.freedesktop.DBus.Properties.Get",
+		0,
+		"org.PulseAudio.Core1.Device",
+		"Volume",
+	).Store(&volumes)
 	if err != nil {
 		return volume{}, fmt.Errorf("get volume: %w", err)
 	}
 
 	var muted bool
-	err = sinkObj.Call("org.freedesktop.DBus.Properties.Get", 0,
-		"org.PulseAudio.Core1.Device", "Mute").Store(&muted)
+	err = sinkObj.Call(
+		"org.freedesktop.DBus.Properties.Get",
+		0,
+		"org.PulseAudio.Core1.Device",
+		"Mute",
+	).Store(&muted)
 	if err != nil {
 		return volume{}, fmt.Errorf("get mute: %w", err)
 	}

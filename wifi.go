@@ -157,7 +157,9 @@ func watchWifiNetworkManagerWithConn(conn *dbus.Conn, ch chan<- result[wifi]) {
 func getWifiIwdWithConn(conn *dbus.Conn) (wifi, error) {
 	iwd := conn.Object("net.connman.iwd", "/")
 	var objects map[dbus.ObjectPath]map[string]map[string]dbus.Variant
-	err := iwd.Call("org.freedesktop.DBus.ObjectManager.GetManagedObjects", 0).Store(&objects)
+	err := iwd.
+		Call("org.freedesktop.DBus.ObjectManager.GetManagedObjects", 0).
+		Store(&objects)
 	if err != nil {
 		return wifi{}, fmt.Errorf("get managed objects: %w", err)
 	}
@@ -198,8 +200,12 @@ func getWifiIwdWithConn(conn *dbus.Conn) (wifi, error) {
 		// Get SSID from Network object
 		networkObj := conn.Object("net.connman.iwd", networkPath)
 		var ssid string
-		err = networkObj.Call("org.freedesktop.DBus.Properties.Get", 0,
-			"net.connman.iwd.Network", "Name").Store(&ssid)
+		err = networkObj.Call(
+			"org.freedesktop.DBus.Properties.Get",
+			0,
+			"net.connman.iwd.Network",
+			"Name",
+		).Store(&ssid)
 		if err != nil {
 			ssid = extractSSIDFromPath(string(path))
 		}
@@ -215,8 +221,12 @@ func getWifiNetworkManagerWithConn(conn *dbus.Conn) (wifi, error) {
 	nm := conn.Object("org.freedesktop.NetworkManager", "/org/freedesktop/NetworkManager")
 
 	var devicePaths []dbus.ObjectPath
-	err := nm.Call("org.freedesktop.DBus.Properties.Get", 0,
-		"org.freedesktop.NetworkManager", "Devices").Store(&devicePaths)
+	err := nm.Call(
+		"org.freedesktop.DBus.Properties.Get",
+		0,
+		"org.freedesktop.NetworkManager",
+		"Devices",
+	).Store(&devicePaths)
 	if err != nil {
 		return wifi{}, fmt.Errorf("get devices: %w", err)
 	}
@@ -226,32 +236,48 @@ func getWifiNetworkManagerWithConn(conn *dbus.Conn) (wifi, error) {
 
 		// Check device type (2 = WiFi)
 		var deviceType uint32
-		err = deviceObj.Call("org.freedesktop.DBus.Properties.Get", 0,
-			"org.freedesktop.NetworkManager.Device", "DeviceType").Store(&deviceType)
+		err = deviceObj.Call(
+			"org.freedesktop.DBus.Properties.Get",
+			0,
+			"org.freedesktop.NetworkManager.Device",
+			"DeviceType",
+		).Store(&deviceType)
 		if err != nil || deviceType != 2 {
 			continue
 		}
 
 		// Get interface name
 		var iface string
-		err = deviceObj.Call("org.freedesktop.DBus.Properties.Get", 0,
-			"org.freedesktop.NetworkManager.Device", "Interface").Store(&iface)
+		err = deviceObj.Call(
+			"org.freedesktop.DBus.Properties.Get",
+			0,
+			"org.freedesktop.NetworkManager.Device",
+			"Interface",
+		).Store(&iface)
 		if err != nil {
 			iface = "wlan"
 		}
 
 		// Get device state (100 = activated/connected)
 		var state uint32
-		err = deviceObj.Call("org.freedesktop.DBus.Properties.Get", 0,
-			"org.freedesktop.NetworkManager.Device", "State").Store(&state)
+		err = deviceObj.Call(
+			"org.freedesktop.DBus.Properties.Get",
+			0,
+			"org.freedesktop.NetworkManager.Device",
+			"State",
+		).Store(&state)
 		if err != nil || state != 100 {
 			return wifi{iface: iface, connected: false}, nil
 		}
 
 		// Get active access point
 		var apPath dbus.ObjectPath
-		err = deviceObj.Call("org.freedesktop.DBus.Properties.Get", 0,
-			"org.freedesktop.NetworkManager.Device.Wireless", "ActiveAccessPoint").Store(&apPath)
+		err = deviceObj.Call(
+			"org.freedesktop.DBus.Properties.Get",
+			0,
+			"org.freedesktop.NetworkManager.Device.Wireless",
+			"ActiveAccessPoint",
+		).Store(&apPath)
 		if err != nil || apPath == "/" {
 			return wifi{iface: iface, connected: false}, nil
 		}
@@ -259,8 +285,12 @@ func getWifiNetworkManagerWithConn(conn *dbus.Conn) (wifi, error) {
 		// Get SSID from access point
 		apObj := conn.Object("org.freedesktop.NetworkManager", apPath)
 		var ssidBytes []byte
-		err = apObj.Call("org.freedesktop.DBus.Properties.Get", 0,
-			"org.freedesktop.NetworkManager.AccessPoint", "Ssid").Store(&ssidBytes)
+		err = apObj.Call(
+			"org.freedesktop.DBus.Properties.Get",
+			0,
+			"org.freedesktop.NetworkManager.AccessPoint",
+			"Ssid",
+		).Store(&ssidBytes)
 		if err != nil {
 			return wifi{iface: iface, connected: true, ssid: "unknown"}, nil
 		}
